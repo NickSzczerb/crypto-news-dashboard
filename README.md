@@ -1,10 +1,7 @@
 # Data analysis
-- Document here the project: crypto-news-dashboard
-- Description: Project Description
-- Data Source:
-- Type of analysis:
-
-Please document the project the better you can.
+- Crypto News Dashboard
+- An app that consolidates all Crypto news in one spot
+- Data Source: Coinmarket cap
 
 # Startup the project
 
