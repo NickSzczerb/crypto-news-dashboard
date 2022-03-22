@@ -5,7 +5,8 @@ from plotly import graph_objs as go
 import datetime as dt
 from datetime import date
 import matplotlib.pyplot as plt
-import requests
+from historicalCrypto import historicalData
+
 
 # -----------Page Layout----------------------
 
@@ -19,7 +20,7 @@ st.sidebar.write("Please choose the crypto and dates:")
 today = dt.datetime.today()
 
 start = st.sidebar.date_input('Start date:',
-                                   today - dt.timedelta(days=90*1),
+                                   today - dt.timedelta(days=90*3),
                                    min_value=today - dt.timedelta(days=365*10),
                                    max_value=today - dt.timedelta(days=31*2))
 end = st.sidebar.date_input('End date:',
@@ -66,21 +67,20 @@ st.markdown(f"""
             #### Change your crypto with the menu on the left """
             )
 
-df = pd.read_csv(
-    'https://raw.githubusercontent.com/plotly/datasets/master/finance-charts-apple.csv'
-)
+df = historicalData(ticker_name, start.strftime('%d/%m/%Y'),
+                    end.strftime('%d/%m/%Y')).reset_index()
 fig = go.Figure(data=[
     go.Candlestick(x=df['Date'],
-                   open=df['AAPL.Open'],
-                   high=df['AAPL.High'],
-                   low=df['AAPL.Low'],
-                   close=df['AAPL.Close'])
+                   open=df['Open'],
+                   high=df['High'],
+                   low=df['Low'],
+                   close=df['Close'])
 ])
 fig.update_layout(title='Example of Candlestick Chart',
-                  yaxis_title='AAPL Stock',
+                  yaxis_title=f'{ticker_name}',
                   shapes=[
-                      dict(x0='2016-12-09',
-                           x1='2016-12-09',
+                      dict(x0=start,
+                           x1=end,
                            y0=0,
                            y1=1,
                            xref='x',
@@ -88,7 +88,7 @@ fig.update_layout(title='Example of Candlestick Chart',
                            line_width=2)
                   ],
                   annotations=[
-                      dict(x='2016-12-09',
+                      dict(x=start,
                            y=0.05,
                            xref='x',
                            yref='paper',
@@ -99,7 +99,9 @@ fig.update_layout(title='Example of Candlestick Chart',
 st.plotly_chart(fig,use_container_width=True)
 
 st.markdown(""" Example of Data format required for chart """)
+
 st.table(df.head(5))
+
 
 st.markdown(f"""
             # Other Ideas
