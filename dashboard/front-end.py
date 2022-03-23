@@ -6,6 +6,8 @@ import datetime as dt
 from datetime import date
 import matplotlib.pyplot as plt
 from historicalCrypto import historicalData
+from charts import candle_chart, moving_average
+import yfinance as yfB
 
 
 # -----------Page Layout----------------------
@@ -51,6 +53,7 @@ ticker_name = st.sidebar.selectbox("Select Crypto:", selected_crypto)
 
 st.text("")
 ma_flag = st.sidebar.checkbox("Moving Average", value=False)
+period = 0
 if ma_flag:
     period = st.sidebar.slider("Choose Period", min_value=7, max_value=100)
 st.text("")
@@ -61,42 +64,12 @@ st.text("")
 
 
 
-st.markdown(f"""
-            ## You are looking at   {ticker_name} data
+df = yfB.download(f'{ticker_name}-USD', start,
+                  end).drop(columns='Adj Close').reset_index()
+#historicalData(ticker_name, start.strftime('%d/%m/%Y'),end.strftime('%d/%m/%Y')).reset_index()
 
-            #### Change your crypto with the menu on the left """
-            )
-
-df = historicalData(ticker_name, start.strftime('%d/%m/%Y'),
-                    end.strftime('%d/%m/%Y')).reset_index()
-fig = go.Figure(data=[
-    go.Candlestick(x=df['Date'],
-                   open=df['Open'],
-                   high=df['High'],
-                   low=df['Low'],
-                   close=df['Close'])
-])
-fig.update_layout(title='Example of Candlestick Chart',
-                  yaxis_title=f'{ticker_name}',
-                  shapes=[
-                      dict(x0=start,
-                           x1=end,
-                           y0=0,
-                           y1=1,
-                           xref='x',
-                           yref='paper',
-                           line_width=2)
-                  ],
-                  annotations=[
-                      dict(x=start,
-                           y=0.05,
-                           xref='x',
-                           yref='paper',
-                           showarrow=False,
-                           xanchor='left',
-                           text='Increase Period Begins')
-                  ])
-st.plotly_chart(fig,use_container_width=True)
+st.plotly_chart(candle_chart(df, ticker_name, start, end, period, ma=ma_flag),
+                use_container_width=True)
 
 st.markdown(""" Example of Data format required for chart """)
 

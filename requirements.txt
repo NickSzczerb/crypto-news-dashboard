@@ -26,3 +26,4 @@ streamlit
 #viz
 matplotlib
 plotly
+yfinance
